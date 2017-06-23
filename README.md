@@ -7,7 +7,7 @@ To create a simple website to show the patching status of server in an environme
 # But how
 With a simple application which accepts web requests. The web request will be sent from each server that is running auter with the patching status to the server hosting this website.
 
-#What information
+# What information
 Initially we will try to work on a traffic light type system:
  - green  = patched
  - orange = patching in progress
