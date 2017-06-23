@@ -1,0 +1,1 @@
+curl -X PUT localhost/status-checkin.php -d server-id=athena -d status-id=1
