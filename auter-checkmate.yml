@@ -1,5 +1,5 @@
 ---
-- hosts: all 
+- hosts: all
   become: True
 #  vars_prompt:
 #    name: "mysql_password"
