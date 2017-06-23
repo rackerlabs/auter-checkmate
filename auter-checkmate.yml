@@ -1,0 +1,83 @@
+---
+- hosts: auter-checkmate-test7
+  become: True
+#  vars_prompt:
+#    name: "mysql_password"
+#    prompt: "Enter root password to be configured for mysql"
+#    private: yes
+  tasks:
+    - name: Install mariadb RHEL7/CentOS7
+      yum:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      with_items:
+        - mariadb-server
+        - mariadb
+      when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '7'
+
+    - name: Install mysql RHEL6/CentOS6
+      yum:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      with_items:
+        - mysql-server
+        - mysql
+      when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '6'
+
+    - name: Enabel and start mariadb RHEL7/CentOS7
+      systemd:
+        name: mariadb
+        state: restarted
+        enabled: yes
+      when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '7'
+
+    - name: Enabel and start mysql RHEL6/CentOS6
+      service:
+        name: mysqld
+        state: restarted
+        enabled: yes
+      when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '6'
+
+    - name: Check if mysql_secure_installation has already been run
+      stat:
+        path: /root/.mysql_secure_installation_run
+      register: mysql_secure_installation_run
+
+    - name: prompt for mysql root password
+      pause:
+        prompt: "Enter root password to be configured for mysql"
+        #private: yes
+      register: mysql_password
+      when: mysql_secure_installation_run.stat.exists == False
+
+    - name: Run equivalent commands to mysql_secure_installation
+      shell: "{{ item }}"
+      with_items:
+        - mysql -e "UPDATE mysql.user SET Password=PASSWORD('{{ mysql_password.user_input }}') WHERE User='root';"
+        - mysql -e "DELETE FROM mysql.user WHERE User='';"
+        - mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        - mysql -e "DROP DATABASE IF EXISTS test;"
+        - mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+        - mysql -e "FLUSH PRIVILEGES;"
+        - touch /root/.mysql_secure_installation_run
+      when: mysql_secure_installation_run.stat.exists == False
+
+    - name: Create /root/.my.cnf
+      shell: echo -e "[client]\nuser=root\npassword={{ mysql_password.user_input }}" > /root/.my.cnf
+      when: mysql_secure_installation_run.stat.exists == False
+
+    - name: check if the auter-checkmate database already exists
+      shell: mysql -e "show databases like 'auter%'"
+      register: databaseExists
+
+    - name: Copy the auter-checkmate database creation sql file to the server
+      copy:
+        src: ./auter-checkmate.sql
+        dest: /root/auter-checkmate.sql
+      when: databaseExists.stdout == ""
+
+    - name: Create the database structure
+      shell: mysql -sf < /root/auter-checkmate.sql
+      when: databaseExists.stdout == ""
