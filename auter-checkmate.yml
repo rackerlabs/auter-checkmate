@@ -95,3 +95,19 @@
     - name: Create the database structure
       shell: mysql -sf < /root/auter-checkmate.sql
       when: databaseExists.stdout == ""
+
+    - name: Copy the web application to the server
+      copy:
+        src: "{{ item }}"
+        dest: "/var/www/html/"
+      with_items:
+        - ./html/status-check-in.php
+        - ./html/homepage.php
+
+    - name: Add iptables rules
+      iptables:
+        chain: INPUT
+        action: insert
+        protocol: tcp
+        destination_port: 80
+        jump: ACCEPT

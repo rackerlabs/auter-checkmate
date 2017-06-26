@@ -9,11 +9,11 @@ if ('PUT' === $method) {
     echo $_put_vars['status-id']." is server status\n";
 
     $servername = "localhost";
-    $username = "updater";
+    $username = "auter-checkmate";
     $password = "access";
-    $dbname = "auter";
-    $sql = "SELECT * from status;";
-    $insertsql = "UPDATE status SET statusid=:passedstatus where serverid=:passedserver";
+    $dbname = "auter_checkmate";
+    $sql = "SELECT * from statuses;";
+    $insertsql = "UPDATE serverstatus SET statusid=:passedstatus where serverid=:passedserver";
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
