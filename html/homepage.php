@@ -21,10 +21,10 @@ class TableRows extends RecursiveIteratorIterator {
 } 
 
 $servername = "localhost";
-$username = "updater";
+$username = "auter-checkmate";
 $password = "access";
-$dbname = "auter";
-$sql = "SELECT * from status;";
+$dbname = "auter_checkmate";
+$sql = "SELECT servername,statusname from serverstatus INNER JOIN statuses ON serverstatus.statusid = statuses.statusid INNER JOIN servers ON serverstatus.serverid = servers.serverid;";
 
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
