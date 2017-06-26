@@ -6,7 +6,7 @@
 #    prompt: "Enter root password to be configured for mysql"
 #    private: yes
   tasks:
-    - name: Install mariadb RHEL7/CentOS7
+    - name: Install mariadb, apache and php RHEL7/CentOS7
       yum:
         name: "{{ item }}"
         update_cache: yes
@@ -14,9 +14,13 @@
       with_items:
         - mariadb-server
         - mariadb
+        - httpd
+        - php
+        - php-mysql
+        - php-pdo
       when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '7'
 
-    - name: Install mysql RHEL6/CentOS6
+    - name: Install mysql,apache and php RHEL6/CentOS6
       yum:
         name: "{{ item }}"
         update_cache: yes
@@ -24,20 +28,30 @@
       with_items:
         - mysql-server
         - mysql
+        - httpd
+        - php
+        - php-mysql
+        - php-pdo
       when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '6'
 
-    - name: Enabel and start mariadb RHEL7/CentOS7
+    - name: Enabel and start mariadb and apache RHEL7/CentOS7
       systemd:
-        name: mariadb
+        name: "{{ item }}"
         state: restarted
         enabled: yes
+      with_items:
+        - httpd
+        - mariadb
       when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '7'
 
     - name: Enabel and start mysql RHEL6/CentOS6
       service:
-        name: mysqld
+        name: "{{ item }}"
         state: restarted
         enabled: yes
+      with_items:
+        - httpd
+        - mysqld
       when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_major_version == '6'
 
     - name: Check if mysql_secure_installation has already been run
