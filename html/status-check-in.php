@@ -2,16 +2,12 @@
 <title> sample </title>
 <body>
 <?php
+include './auter_checkmate_cred.php';
 $method = $_SERVER['REQUEST_METHOD'];
 if ('PUT' === $method) {
     parse_str(file_get_contents('php://input'), $_put_vars);
     echo $_put_vars['server-id']." is serverid\n";
     echo $_put_vars['status-id']." is server status\n";
-
-    $servername = "localhost";
-    $username = "auter-checkmate";
-    $password = "access";
-    $dbname = "auter_checkmate";
     $sql = "SELECT * from statuses;";
     $insertsql = "UPDATE serverstatus SET statusid=:passedstatus where serverid=:passedserver";
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);

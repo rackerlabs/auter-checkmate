@@ -1,4 +1,5 @@
 <?php
+include './auter_checkmate_cred.php';
 echo  "<table style='border: solid 1px black;'>";
 echo "<tr><th>Host</th><th>Status ID</th><th>Status String</th></tr>";
 
@@ -20,9 +21,6 @@ class TableRows extends RecursiveIteratorIterator {
     } 
 } 
 
-$servername = "localhost";
-$username = "auter-checkmate";
-$password = "access";
 $dbname = "auter_checkmate";
 $sql = "SELECT servername,statusname from serverstatus INNER JOIN statuses ON serverstatus.statusid = statuses.statusid INNER JOIN servers ON serverstatus.serverid = servers.serverid;";
 
