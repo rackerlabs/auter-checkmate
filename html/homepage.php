@@ -56,7 +56,6 @@
              echo "Error: " . $e->getMessage();
          }
          $conn = null;
-         echo "</table>";
       ?>
    </table>
 </body>
